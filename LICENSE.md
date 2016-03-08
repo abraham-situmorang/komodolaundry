@@ -1,6 +1,6 @@
 KomodoLaundry - Open Source 
 
-Copyright (C) 2006-2013 Cristian Libardo, cristian at libardo dot com
+Copyright (C) 2006-2013 Abraham Situmorang, abraham dot situmorang at gmail dot com
 Copyright (C) 2012-2013 Benjamin Herila, ben [A] herila.net
 Copyright (C) N2 Contributors
 
