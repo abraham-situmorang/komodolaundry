@@ -1,0 +1,121 @@
+﻿@{
+    Layout = "~/Views/Shared/_TeledataTheme.cshtml";
+    ViewBag.Title = "Customer";
+}
+<h2>@ViewBag.Title</h2>
+<h3>@ViewBag.Message</h3>
+<hr />
+<button class="k-button k-button-icontext" id="btnCreateNew">
+    <span class="k-icon k-add"></span>Customer Baru
+</button>
+<br />&nbsp;
+
+@(Html.Kendo().Grid<KomodoLaundry.WebApp.Models.CustomerModel>()
+    .Name("grid")
+    .Pageable(pageable => pageable
+        .Refresh(true)
+        .PageSizes(new int[] { 20, 50, 200 })
+        .ButtonCount(5))
+    .Sortable()
+    .Groupable()
+    .Scrollable()
+    .Filterable()
+    .HtmlAttributes(new { style = "height:430px;" })
+    .Columns(columns =>
+    {
+        columns.Bound(o => o.Name);
+        columns.Bound(o => o.Address);
+        columns.Bound(o => o.Mobile);
+        columns.Bound(o => o.Email);
+        columns.Bound(o => o.CreatedDate).Format("{0:dd-MMM-yyyy}");
+
+        columns.Bound(o => o.DepositWeight).Title("Deposit Weight (Kg)");
+        columns.Bound(o => o.IsActive);
+        columns.Bound(o => o.Note);
+        columns.Bound(o => o.Branch);
+        columns.Bound(o => o.RegisterBy);
+                
+        columns.Bound(o => o.Id).Width(80).Filterable(false)
+            .Title("ACTION")
+            .ClientTemplate("<a href='javascript:editData(\"#= Id#\");' title='Edit'>EDIT</a>");
+        columns.Bound(o => o.Id).Width(100).Filterable(false)
+            .HeaderHtmlAttributes(new { style = "display:none;" })
+            .ClientTemplate("<a href='javascript:depositData(\"#= Id#\");' title='DEPOSIT'>DEPOSIT</a>");
+        columns.Bound(o => o.Id).Width(100).Filterable(false)
+            .HeaderHtmlAttributes(new { style = "display:none;" })
+            .ClientTemplate("<a href='javascript:disabledData(\"#= Id#\");' title='Non-aktifkan'>NONAKTIF</a>");
+        columns.Bound(o => o.Id).Width(80).Filterable(false)
+            .HeaderHtmlAttributes(new { style = "display:none;" })
+            .ClientTemplate("<a href='javascript:deleteData(\"#= Id#\");' title='Hapus'>DELETE</a>");
+    })
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .PageSize(20)
+        .Read(read => read.Action("Read", "Index"))
+     )
+     .Selectable()
+    .Resizable(resize => resize.Columns(true))
+)
+
+
+<script>
+    $("#btnCreateNew").bind("click", function () {
+        window.location.href = "/Customer/Create";
+    });
+
+    function depositData(id) {
+        window.location.href = "/Customer/Deposit?id=" + id;
+    }
+
+    function editData(id) {
+        window.location.href = "/Customer/Edit?id=" + id;
+    }
+
+    function deleteData(id) {
+        alertify.confirm("Anda yakin ?", function (e) {
+            if (e) {
+                funcDeleteData(id);
+            }
+        });
+    }
+    function funcDeleteData(id) {
+        $.ajax({
+            url: '@Url.Action("Delete")', type: "POST", dataType: "json",
+            data: {
+                id: id
+            },
+            success: function (data) {
+                if (data.success == false) {
+                    alertify.alert(data.message);
+                    return;
+                }
+                $("#grid").data("kendoGrid").dataSource.read();
+            },
+            error: function () { alertify.alert("Application error. Please try again."); }
+        });
+    }
+
+    function disabledData(id) {
+        alertify.confirm("Anda yakin ?", function (e) {
+            if (e) {
+                funcDisabledData(id);
+            }
+        });
+    }
+    function funcDisabledData(id) {
+        $.ajax({
+            url: '@Url.Action("Disabled")', type: "POST", dataType: "json",
+            data: {
+                id: id
+            },
+            success: function (data) {
+                if (data.success == false) {
+                    alertify.alert(data.message);
+                    return;
+                }
+                $("#grid").data("kendoGrid").dataSource.read();
+            },
+            error: function () { alertify.alert("Application error. Please try again."); }
+        });
+    }
+</script>

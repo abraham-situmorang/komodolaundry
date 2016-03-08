@@ -1,0 +1,43 @@
+﻿@model KomodoLaundry.WebApp.DataLayer.CustomerDeposit
+@{
+    Layout = "~/Views/Shared/_TeledataTheme.cshtml";
+    ViewBag.Title = "Tambah Deposit";
+}
+<h2>@ViewBag.Title</h2>
+<h3>@ViewBag.Message</h3>
+<hr />
+<button class="k-button k-button-icontext" id="btnBack">
+    <span class="k-icon k-i-arrow-w"></span>Kembali
+</button>
+&nbsp;
+<button class="k-button k-button-icontext" id="btnSave">
+    <span class="k-icon k-i-tick"></span>Simpan
+</button>
+<hr />
+
+Nomor:<br />
+@Html.TextBox("txtDocNumber", Model.DocNumber, new { @class = "td", style = "width : 320px" })
+<br /><br />
+
+Note:<br />
+@Html.TextArea("txtNote", Model.Note, new { @class = "td", style = "width : 320px" })
+
+<script>
+    var _Id = "";
+    $(document).ready(function () {
+        GetData("@ViewBag.Id");
+    });
+    function GetData(id)
+    {
+        _Id = id;
+    }
+
+    $("#btnSave").bind("click", function () {
+        
+    });
+
+    $("#btnBack").bind("click", function () {
+        closeLoading();
+        window.location.href = "/Customer/Index";
+    });
+</script>

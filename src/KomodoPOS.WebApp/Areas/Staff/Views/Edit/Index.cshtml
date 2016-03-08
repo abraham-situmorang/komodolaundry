@@ -1,0 +1,130 @@
+﻿@{
+    Layout = "~/Views/Shared/_TeledataTheme.cshtml";
+    ViewBag.Title = "Edit Staf";
+}
+<h2>@ViewBag.Title</h2>
+<h3>@ViewBag.Message</h3>
+
+<button class="k-button k-button-icontext" id="btnBack">
+    <span class="k-icon k-i-arrow-w"></span>Kembali
+</button>
+&nbsp;
+<button class="k-button k-button-icontext" id="btnSave">
+    <span class="k-icon k-i-tick"></span>Simpan
+</button>
+<hr />
+
+@Html.Hidden("hiddenId")
+Full Name:<br />
+@Html.TextBox("txtFullName", "", new { @class = "td", style = "width : 320px" })
+<br /><br />
+
+Username:<br />
+@Html.TextBox("txtUsername", "", new { @class = "td", style = "width : 320px" })
+<br /><br />
+
+Email:<br />
+@Html.TextBox("txtEmail", "", new { @class = "td", style = "width : 320px" })
+<br /><br />
+
+Gerai:
+@(Html.Kendo().ComboBox()
+        .Name("cmbLocation")
+        .DataTextField("Display")
+        .DataValueField("Key")
+        .DataSource(source =>
+        {
+            source.Read(read =>
+            {
+                read.Action("GetLocation", "Create");
+            });
+        })
+        .HtmlAttributes(new { style = "width:300px" })
+        .Filter(FilterType.Contains)
+        .Suggest(true)
+        .Placeholder("-Select value-"))
+<br /><br />
+
+Cassier:<br />
+@Html.CheckBox("chkCassier")
+<br /><br />
+
+Manage Cash:<br />
+@Html.CheckBox("chkManageCash")
+<br /><br />
+
+Manage Customer:<br />
+@Html.CheckBox("chkManageCustomer")
+<br /><br />
+
+Manage Product Price:<br />
+@Html.CheckBox("chkManageProductPrice")
+<br /><br />
+
+Canceling Transaction:<br />
+@Html.CheckBox("chkCancelingTransaction")
+<br /><br />
+
+<script>
+    $(document).ready(function () {
+        GetData("@ViewBag.Id");
+    });
+
+    function GetData(id) {
+        $.ajax({
+            url: '@Url.Action("GetData")', type: "GET", dataType: "json",
+            data: {
+                id: id,
+            },
+            success: function (data) {
+                if (data.success == false) {
+                    alertify.alert(data.message);
+                    return;
+                }
+                document.getElementById('hiddenId').value = data.Id;
+                document.getElementById('txtFullName').value = data.FullName;
+                document.getElementById('txtUsername').value = data.Username;
+                document.getElementById('txtEmail').value = data.Email;
+                $("#cmbLocation").data("kendoComboBox").value(data.Location);
+
+                document.getElementById("chkCassier").checked = data.Cassier;
+                document.getElementById("chkManageCash").checked = data.ManageCash;
+                document.getElementById("chkManageCustomer").checked = data.ManageCustomer;
+                document.getElementById("chkManageProductPrice").checked = data.ManageProductPrice;
+                document.getElementById("chkCancelingTransaction").checked = data.CancelingTransaction;
+            },
+            error: function () { alertify.alert("Application error. Please try again."); }
+        });
+    }
+
+    $("#btnSave").bind("click", function () {
+        $.ajax({
+            url: '@Url.Action("Edit")', type: "POST", dataType: "json",
+            data: {
+                id: document.getElementById('hiddenId').value,
+                fullName: document.getElementById('txtFullName').value,
+                username: document.getElementById('txtUsername').value,
+                email: document.getElementById('txtEmail').value,
+                locationId: $("#cmbLocation").data("kendoComboBox").value(),
+
+                cassier: document.getElementById("chkCassier").checked,
+                manageCash: document.getElementById("chkManageCash").checked,
+                manageCustomer: document.getElementById("chkManageCustomer").checked,
+                manageProductPrice: document.getElementById("chkManageProductPrice").checked,
+                cancelingTransaction: document.getElementById("chkCancelingTransaction").checked,
+            },
+            success: function (data) {
+                if (data.success == false) {
+                    alertify.alert(data.message);
+                    return;
+                }
+                window.location.href = "/Staff/Index";
+            },
+            error: function () { alertify.alert("Application error. Please try again."); }
+        });
+    });
+
+    $("#btnBack").bind("click", function () {
+        window.location.href = "/Staff/Index";
+    });
+</script>

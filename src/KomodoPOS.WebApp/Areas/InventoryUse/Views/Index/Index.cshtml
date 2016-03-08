@@ -1,0 +1,58 @@
+﻿@{
+    Layout = "~/Views/Shared/_TeledataTheme.cshtml";
+    ViewBag.Title = "Penggunaan Inventory";
+}
+<h2>@ViewBag.Title</h2>
+<h3>@ViewBag.Message</h3>
+<hr />
+<button class="k-button k-button-icontext" id="btnCreateNew">
+    <span class="k-icon k-add"></span>Penggunaan Inventory Baru
+</button>
+<br />&nbsp;
+
+@(Html.Kendo().Grid<KomodoLaundry.WebApp.Models.InventoryUseModel>()
+    .Name("grid")
+    .Pageable(pageable => pageable
+        .Refresh(true)
+        .PageSizes(new int[] { 20, 50, 200 })
+        .ButtonCount(5))
+    .Sortable()
+    .Groupable()
+    .Scrollable()
+    .Filterable()
+    .HtmlAttributes(new { style = "height:430px;" })
+    .Columns(columns =>
+    {
+        columns.Bound(o => o.DocId);
+        columns.Bound(o => o.Staff);
+        columns.Bound(o => o.Branch);
+        columns.Bound(o => o.CreatedDate).Format("{0:dd-MMM-yyyy}");
+        columns.Bound(o => o.IsVoid);
+        columns.Bound(o => o.Note);
+        
+        columns.Bound(o => o.Id).Width(110).Filterable(false)
+            .Title("ACTION")
+            .ClientTemplate("<a href='javascript:viewData(\"#= DocId#\");' title='Data Inventory'>DATA INVENTORY</a>");
+    })
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .PageSize(20)
+        .Read(read => read.Action("Read", "Index"))
+     )
+     .Selectable()
+    .Resizable(resize => resize.Columns(true))
+)
+@Html.Partial("Stock")
+
+<script>
+    var _DocId = "";
+    $("#btnCreateNew").bind("click", function () {
+        window.location.href = "/InventoryUse/Create";
+    });
+
+    function viewData(DocId) {
+        _DocId = DocId;
+        $("#windowInventoryStock").data("kendoWindow").open().center();
+        $("#gridStock").data("kendoGrid").dataSource.read();
+    }
+</script>

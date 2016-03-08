@@ -1,0 +1,65 @@
+﻿@{
+    Layout = "~/Views/Shared/_TeledataTheme.cshtml";
+    ViewBag.Title = "Transaksi";
+}
+<h2>@ViewBag.Title</h2>
+<h3>@ViewBag.Message</h3>
+
+<button class="k-button k-button-icontext" id="btnBack">
+    <span class="k-icon k-i-arrow-w"></span>Kembali
+</button>
+<hr />
+
+@(Html.Kendo().Grid<KomodoLaundry.WebApp.Models.COA.COATransactionModel>()
+    .Name("grid")
+    .Pageable(pageable => pageable
+        .Refresh(true)
+        .PageSizes(new int[] { 20, 50, 200 })
+        .ButtonCount(5))
+    .Sortable()
+    .Groupable()
+    .Scrollable()
+    .Filterable()
+    .HtmlAttributes(new { style = "height:430px;" })
+    .Columns(columns =>
+    {
+        columns.Bound(o => o.CreatedDate).Title("Tanggal").Format(KomodoLaundry.WebApp.Framework.Data.DateTimeFormat.FullDateTime);
+        columns.Bound(o => o.Name);
+        columns.Bound(o => o.Description);
+
+        columns.Bound(o => o.Debit).Format(KomodoLaundry.WebApp.Framework.Data.DecimalFormat.Currency);
+        columns.Bound(o => o.Credit).Format(KomodoLaundry.WebApp.Framework.Data.DecimalFormat.Currency);
+        columns.Bound(o => o.Balance).Format(KomodoLaundry.WebApp.Framework.Data.DecimalFormat.Currency);
+    })
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .PageSize(20)
+        .Read(read => read.Action("Read", "Detail").Data("OnParDataGrid"))
+     )
+     .Selectable()
+    .Resizable(resize => resize.Columns(true))
+)
+
+<script>
+    var _CoaId = "";
+    $(document).ready(function () {
+        GetData("@ViewBag.Id");
+    });
+
+    function GetData(cid)
+    {
+        _CoaId = cid;
+    }
+
+    function OnParDataGrid() {
+        return {
+            id: '@ViewBag.Id'
+        };
+    }
+
+    
+
+    $("#btnBack").bind("click", function () {
+        window.location.href = "/CashBank/Index";
+    });
+</script>

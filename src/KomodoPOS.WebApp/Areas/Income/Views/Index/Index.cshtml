@@ -1,0 +1,38 @@
+﻿@{
+    Layout = "~/Views/Shared/_TeledataTheme.cshtml";
+    ViewBag.Title = "Pemasukan";
+}
+<h2>@ViewBag.Title</h2>
+<h3>@ViewBag.Message</h3>
+<hr />
+
+@(Html.Kendo().Grid<KomodoLaundry.WebApp.Models.IncomeModel>()
+    .Name("grid")
+    .Pageable(pageable => pageable
+        .Refresh(true)
+        .PageSizes(new int[] { 20, 50, 200 })
+        .ButtonCount(5))
+    .Sortable()
+    .Groupable()
+    .Scrollable()
+    .Filterable()
+    .HtmlAttributes(new { style = "height:430px;" })
+    .Columns(columns =>
+    {
+        columns.Bound(o => o.CreatedDate).Format(KomodoLaundry.WebApp.Framework.Data.DateTimeFormat.FullDateTime).Title("Tanggal");
+        columns.Bound(o => o.Name);
+        columns.Bound(o => o.Description);
+        columns.Bound(o => o.Money).Title("Jumlah").Format(KomodoLaundry.WebApp.Framework.Data.DecimalFormat.Currency);
+                
+        columns.Bound(o => o.IsVoid);
+        columns.Bound(o => o.Branch);
+        columns.Bound(o => o.Staff);
+    })
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .PageSize(20)
+        .Read(read => read.Action("Read", "Index"))
+     )
+     .Selectable()
+    .Resizable(resize => resize.Columns(true))
+)

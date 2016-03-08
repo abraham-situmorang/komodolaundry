@@ -1,0 +1,53 @@
+﻿@{
+    Layout = "~/Views/Shared/_TeledataTheme.cshtml";
+    ViewBag.Title = "Harga Layanan";
+}
+<h2>@ViewBag.Title</h2>
+<h3>@ViewBag.Message</h3>
+<hr />
+<button class="k-button k-button-icontext" id="btnCreateNew">
+    <span class="k-icon k-add"></span>Tambah Layanan
+</button>
+<br />&nbsp;
+
+@(Html.Kendo().Grid<KomodoLaundry.WebApp.Models.ServicesDataModel>()
+    .Name("grid")
+    .Pageable(pageable => pageable
+        .Refresh(true)
+        .PageSizes(new int[] { 20, 50, 200 })
+        .ButtonCount(5))
+    .Sortable()
+    .Groupable()
+    .Scrollable()
+    .Filterable()
+    .HtmlAttributes(new { style = "height:430px;" })
+    .Columns(columns =>
+    {
+        columns.Bound(o => o.Name);
+        columns.Bound(o => o.Price);
+        columns.Bound(o => o.Duration);
+        columns.Bound(o => o.Note);
+                
+        columns.Bound(o => o.Id).Width(80).Filterable(false)
+            .Title("ACTION")
+            .ClientTemplate("<a href='javascript:editData(\"#= Id#\");' title='Edit'>EDIT</a>");
+    })
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .PageSize(20)
+        .Read(read => read.Action("Read", "Index"))
+     )
+     .Selectable()
+    .Resizable(resize => resize.Columns(true))
+)
+
+
+<script>
+    $("#btnCreateNew").bind("click", function () {
+        window.location.href = "/ServicesData/Create";
+    });
+
+    function editData(id) {
+        window.location.href = "/ServicesData/Edit?id=" + id;
+    }
+</script>

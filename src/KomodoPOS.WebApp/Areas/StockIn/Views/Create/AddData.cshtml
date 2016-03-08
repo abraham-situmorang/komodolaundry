@@ -1,0 +1,78 @@
+﻿@(Html.Kendo().Window()
+    .Name("windowInventoryStockAddData")
+    .Title("Stok Percabang")
+    .Content
+    (@<text>
+
+<button class="k-button k-button-icontext" id="btnSaveData">
+    <span class="k-icon k-i-tick"></span>Simpan
+</button>
+<br />&nbsp;
+
+Inventory:<br />
+@(Html.Kendo().ComboBox()
+        .Name("cmbInventory")
+        .DataTextField("Display")
+        .DataValueField("Key")
+        .DataSource(source =>
+        {
+            source.Read(read =>
+            {
+                read.Action("GetInventoryData", "Create");
+            });
+        })
+        .HtmlAttributes(new { style = "width:300px" })
+        .Filter(FilterType.Contains)
+        .Suggest(true)
+        .Placeholder("-Select value-"))
+<br /><br />
+
+Qty:<br />
+@(Html.Kendo().NumericTextBox().Name("txtQty"))
+
+
+    </text>)
+    .Draggable()
+    .Resizable()
+    .Visible(false)
+    .Modal(true)
+    .Actions(actions => actions.Pin().Minimize().Maximize().Close())
+)
+
+<script>
+    $("#btnSaveData").bind("click", function () {
+        $.ajax({
+            url: '@Url.Action("AddData")', type: "POST", dataType: "json",
+            data: {
+                invId: $("#cmbInventory").data("kendoComboBox").value(),
+                qty: document.getElementById('txtQty').value
+            },
+            success: function (data) {
+                if (data.success == false) {
+                    alertify.alert(data.message);
+                    return;
+                }
+                $("#windowInventoryStockAddData").data("kendoWindow").close();
+                $("#gridStock").data("kendoGrid").dataSource.read();
+            },
+            error: function () { alertify.alert("Application error. Please try again."); }
+        });
+    });
+
+    function deleteData(id) {
+        $.ajax({
+            url: '@Url.Action("DelData")', type: "POST", dataType: "json",
+            data: {
+                id: id
+            },
+            success: function (data) {
+                if (data.success == false) {
+                    alertify.alert(data.message);
+                    return;
+                }
+                $("#gridStock").data("kendoGrid").dataSource.read();
+            },
+            error: function () { alertify.alert("Application error. Please try again."); }
+        });
+    }
+</script>

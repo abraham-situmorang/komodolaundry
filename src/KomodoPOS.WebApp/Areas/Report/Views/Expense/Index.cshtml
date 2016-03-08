@@ -1,0 +1,58 @@
+﻿@{
+    Layout = "~/Views/Shared/_TeledataTheme.cshtml";
+    ViewBag.Title = "Laporan Pengeluaran";
+}
+<h2>@ViewBag.Title</h2>
+<h3>@ViewBag.Message</h3>
+
+<button class="k-button k-button-icontext" id="btnCreateNew">
+    <span class="k-icon k-add"></span>Buat Pengeluaran
+</button>
+<hr />
+
+@(Html.Kendo().Grid<KomodoLaundry.WebApp.Models.ExpenseModel>()
+    .Name("grid")
+    .Pageable(pageable => pageable
+        .Refresh(true)
+        .PageSizes(new int[] { 20, 50, 200 })
+        .ButtonCount(5))
+    .Sortable()
+    .Groupable()
+    .Scrollable()
+    .Filterable()
+    .HtmlAttributes(new { style = "height:430px;" })
+    .Columns(columns =>
+    {
+        columns.Bound(o => o.Name);
+        columns.Bound(o => o.Description);
+        columns.Bound(o => o.Money).Format("{0:#,##}");
+        columns.Bound(o => o.Cash);
+        columns.Bound(o => o.CreatedDate).Format("{0:dd-MMM-yyyy}");
+        columns.Bound(o => o.IsVoid);
+        columns.Bound(o => o.Branch);
+        columns.Bound(o => o.Staff);
+        columns.Bound(o => o.ExpenseType);
+        
+        columns.Bound(o => o.Id).Width(80).Filterable(false)
+            .Title("ACTION")
+            .ClientTemplate("<a href='javascript:voidData(\"#= Id#\");' title='Void'>VOID</a>");
+    })
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .PageSize(20)
+        .Read(read => read.Action("Read", "Expense"))
+     )
+     .Selectable()
+    .Resizable(resize => resize.Columns(true))
+)
+
+
+<script>
+    $("#btnCreateNew").bind("click", function () {
+        window.location.href = "/Expense/Create";
+    });
+
+    function voidData(id) {
+        
+    }
+</script>

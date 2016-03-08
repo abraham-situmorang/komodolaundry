@@ -1,0 +1,61 @@
+﻿@{
+    Layout = "~/Views/Shared/_TeledataTheme.cshtml";
+    ViewBag.Title = "Biaya";
+}
+<h2>@ViewBag.Title</h2>
+<h3>@ViewBag.Message</h3>
+
+<button class="k-button k-button-icontext" id="btnCreateNew">
+    <span class="k-icon k-add"></span>Buat Biaya Baru
+</button>
+<hr />
+
+@(Html.Kendo().Grid<KomodoLaundry.WebApp.Models.ExpenseModel>()
+    .Name("grid")
+    .Pageable(pageable => pageable
+        .Refresh(true)
+        .PageSizes(new int[] { 20, 50, 200 })
+        .ButtonCount(5))
+    .Sortable()
+    .Groupable()
+    .Scrollable()
+    .Filterable()
+    .HtmlAttributes(new { style = "height:430px;" })
+    .Columns(columns =>
+    {
+        columns.Bound(o => o.CreatedDate).Format(KomodoLaundry.WebApp.Framework.Data.DateTimeFormat.FullDateTime).Title("Tanggal");
+        columns.Bound(o => o.DocNumber).Title("Nomor");
+        columns.Bound(o => o.Note);
+        columns.Bound(o => o.CashBank);
+        columns.Bound(o => o.TotalAmount);
+        columns.Bound(o => o.IsVoid);
+        columns.Bound(o => o.Staff);
+        columns.Bound(o => o.Branch);
+        
+        columns.Bound(o => o.Id).Width(140).Filterable(false)
+            .Title("ACTION")
+            .ClientTemplate("<a href='javascript:viewData(\"#= DocNumber#\");' title='Daftar Biaya'>DAFTAR BIAYA</a>");
+    })
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .PageSize(20)
+        .Read(read => read.Action("Read", "Index"))
+     )
+     .Selectable()
+    .Resizable(resize => resize.Columns(true))
+)
+
+@Html.Partial("Detail")
+
+<script>
+    var _DocId = "";
+    $("#btnCreateNew").bind("click", function () {
+        window.location.href = "/Expense/Create";
+    });
+
+    function viewData(DocId) {
+        _DocId = DocId;
+        $("#windowList").data("kendoWindow").open().center();
+        $("#gridList").data("kendoGrid").dataSource.read();
+    }
+</script>

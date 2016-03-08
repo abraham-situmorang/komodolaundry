@@ -1,0 +1,82 @@
+﻿@(Html.Kendo().Window()
+    .Name("windowAddData")
+    .Title("Tambah Rincian")
+    .Content
+    (@<text>
+
+<button class="k-button k-button-icontext" id="btnSaveData">
+    <span class="k-icon k-i-tick"></span>Simpan
+</button>
+<br />&nbsp;
+
+Akun:<br />
+@(Html.Kendo().ComboBox()
+.Name("cmbAccountData")
+.DataTextField("Display")
+.DataValueField("Key")
+.DataSource(source =>
+{
+    source.Read(read =>
+    {
+        read.Action("GetCoaData", "Deposit");
+    });
+})
+.HtmlAttributes(new { style = "width:300px" })
+.Filter(FilterType.Contains)
+.Suggest(true)
+.Placeholder("-Select value-"))
+<br /><br />
+
+Deskripsi:<br />
+@Html.TextBox("txtDescription", "", new { @class = "td", style = "width : 320px" })
+<br /><br />
+
+Jumlah:<br />
+@(Html.Kendo().NumericTextBox().Name("txtAmount"))
+
+    </text>)
+    .Draggable()
+    .Resizable()
+    .Visible(false)
+    .Modal(true)
+    .Actions(actions => actions.Pin().Minimize().Maximize().Close())
+)
+
+<script>
+    $("#btnSaveData").bind("click", function () {
+        $.ajax({
+            url: '@Url.Action("AddData")', type: "POST", dataType: "json",
+            data: {
+                coaId: $("#cmbAccountData").data("kendoComboBox").value(),
+                description: document.getElementById('txtDescription').value,
+                amount: document.getElementById('txtAmount').value
+            },
+            success: function (data) {
+                if (data.success == false) {
+                    alertify.alert(data.message);
+                    return;
+                }
+                $("#windowAddData").data("kendoWindow").close();
+                $("#gridDetail").data("kendoGrid").dataSource.read();
+            },
+            error: function () { alertify.alert("Application error. Please try again."); }
+        });
+    });
+
+    function deleteData(id) {
+        $.ajax({
+            url: '@Url.Action("DelData")', type: "POST", dataType: "json",
+            data: {
+                id: id
+            },
+            success: function (data) {
+                if (data.success == false) {
+                    alertify.alert(data.message);
+                    return;
+                }
+                $("#gridDetail").data("kendoGrid").dataSource.read();
+            },
+            error: function () { alertify.alert("Application error. Please try again."); }
+        });
+    }
+</script>

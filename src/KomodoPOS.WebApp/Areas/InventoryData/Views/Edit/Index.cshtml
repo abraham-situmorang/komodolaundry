@@ -1,0 +1,99 @@
+﻿@{
+    Layout = "~/Views/Shared/_TeledataTheme.cshtml";
+    ViewBag.Title = "Edit Inventory";
+}
+<h2>@ViewBag.Title</h2>
+<h3>@ViewBag.Message</h3>
+
+<button class="k-button k-button-icontext" id="btnBack">
+    <span class="k-icon k-i-arrow-w"></span>Kembali
+</button>
+&nbsp;
+<button class="k-button k-button-icontext" id="btnSave">
+    <span class="k-icon k-i-tick"></span>Simpan
+</button>
+<hr />
+
+@Html.Hidden("hiddenId")
+
+Kategori Inventory:<br />
+@(Html.Kendo().ComboBox()
+        .Name("cmbInventoryCategory")
+        .DataTextField("Display")
+        .DataValueField("Key")
+        .DataSource(source =>
+        {
+            source.Read(read =>
+            {
+                read.Action("GetInventoryCategory", "Create");
+            });
+        })
+        .HtmlAttributes(new { style = "width:300px" })
+        .Filter(FilterType.Contains)
+        .Suggest(true)
+        .Placeholder("-Select value-"))
+<br /><br />
+
+Nama:<br />
+@Html.TextBox("txtName", "", new { @class = "td", style = "width : 320px" })
+<br /><br />
+
+Unit:<br />
+@Html.TextBox("txtUnit", "", new { @class = "td", style = "width : 320px" })
+<br /><br />
+
+Note:<br />
+@Html.TextArea("txtNote", "", new { @class = "td", style = "width : 320px" })
+
+<script>
+    $(document).ready(function () {
+        GetData("@ViewBag.Id");
+    });
+
+    function GetData(id)
+    {
+        $.ajax({
+            url: '@Url.Action("GetData")', type: "GET", dataType: "json",
+            data: {
+                id: id,
+            },
+            success: function (data) {
+                if (data.success == false) {
+                    alertify.alert(data.message);
+                    return;
+                }
+                document.getElementById('hiddenId').value = data.Id;
+                $("#cmbInventoryCategory").data("kendoComboBox").value(data.InventoryCategory);
+                document.getElementById('txtName').value = data.Name;
+                document.getElementById('txtUnit').value = data.Unit;
+                document.getElementById('txtNote').value = data.Note;
+            },
+            error: function () { alertify.alert("Application error. Please try again."); }
+        });
+    }
+
+    $("#btnSave").bind("click", function () {
+        $.ajax({
+            url: '@Url.Action("Edit")', type: "POST", dataType: "json",
+            data: {
+                id: document.getElementById('hiddenId').value,
+                inventoryCategoryId: $("#cmbInventoryCategory").data("kendoComboBox").value(),
+                name: document.getElementById('txtName').value,
+                unit: document.getElementById('txtUnit').value,
+                note: document.getElementById('txtNote').value,
+            },
+            success: function (data) {
+                if (data.success == false) {
+                    alertify.alert(data.message);
+                    return;
+                }
+                window.location.href = "/InventoryData/Index";
+            },
+            error: function () { alertify.alert("Application error. Please try again."); }
+        });
+    });
+
+    $("#btnBack").bind("click", function () {
+        window.location.href = "/InventoryData/Index";
+    });
+</script>

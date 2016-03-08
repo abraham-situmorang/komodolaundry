@@ -1,0 +1,47 @@
+﻿@(Html.Kendo().Window()
+    .Name("windowInventoryStock")
+    .Title("Stok Percabang")
+    .Width(500)
+    .Content
+    (@<text>
+
+@(Html.Kendo().Grid<KomodoLaundry.WebApp.Models.InventoryStockModel>()
+    .Name("gridStock")
+    .Pageable(pageable => pageable
+        .Refresh(true)
+        .PageSizes(new int[] { 20, 50, 200 })
+        .ButtonCount(5))
+    .Sortable()
+    .Groupable()
+    .Scrollable()
+    .Filterable()
+    .Columns(columns =>
+    {
+        columns.Bound(o => o.Branch);
+        columns.Bound(o => o.Qty).Width(100);
+    })
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .PageSize(20)
+        .Read(read => read.Action("ReadStock", "Index").Data("OnParameterStock"))
+     )
+     .Selectable()
+    .Resizable(resize => resize.Columns(true))
+)
+
+
+    </text>)
+    .Draggable()
+    .Resizable()
+    .Visible(false)
+    .Modal(true)
+    .Actions(actions => actions.Pin().Minimize().Maximize().Close())
+)
+
+<script>
+    function OnParameterStock() {
+        return {
+            invId: _InvId
+        };
+    }
+</script>

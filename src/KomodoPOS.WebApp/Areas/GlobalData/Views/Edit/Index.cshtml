@@ -1,0 +1,95 @@
+﻿@{
+    Layout = "~/Views/Shared/_TeledataTheme.cshtml";
+    ViewBag.Title = "Edit Global Data";
+}
+<h2>@ViewBag.Title</h2>
+<h3>@ViewBag.Message</h3>
+
+<button class="k-button k-button-icontext" id="btnBack">
+    <span class="k-icon k-i-arrow-w"></span>Back
+</button>
+&nbsp;
+<button class="k-button k-button-icontext" id="btnSave">
+    <span class="k-icon k-i-tick"></span>Save
+</button>
+<hr />
+
+@Html.Hidden("hiddenId")
+
+Global Category:<br />
+@(Html.Kendo().ComboBox()
+        .Name("cmbGlobalCategory")
+        .DataTextField("Display")
+        .DataValueField("Key")
+        .DataSource(source =>
+        {
+            source.Read(read =>
+            {
+                read.Action("GetGlobalCategory", "Create");
+            });
+        })
+        .HtmlAttributes(new { style = "width:300px" })
+        .Filter(FilterType.Contains)
+        .Suggest(true)
+        .Placeholder("-Select value-"))
+<br /><br />
+
+Nama:<br />
+@Html.TextBox("txtName", "", new { @class = "td", style = "width : 320px" })
+<br /><br />
+
+Order By:<br />
+@(Html.Kendo().NumericTextBox().Name("txtOrderBy"))
+
+<script>
+    $(document).ready(function () {
+        GetData("@ViewBag.Id");
+    });
+
+    function GetData(id)
+    {
+        $.ajax({
+            url: '@Url.Action("GetData")', type: "GET", dataType: "json",
+            data: {
+                id: id,
+            },
+            success: function (data) {
+                if (data.success == false) {
+                    alertify.alert(data.message);
+                    return;
+                }
+                document.getElementById('hiddenId').value = data.Id;
+                $("#cmbGlobalCategory").data("kendoComboBox").value(data.Category);
+                document.getElementById('txtName').value = data.Name;
+                document.getElementById('txtOrderBy').value = data.OrderBy;
+                
+            },
+            error: function () { alertify.alert("Application error. Please try again."); }
+        });
+    }
+
+    $("#btnSave").bind("click", function () {
+        $.ajax({
+            url: '@Url.Action("Edit")', type: "POST", dataType: "json",
+            data: {
+                id: document.getElementById('hiddenId').value,
+
+                name: document.getElementById('txtName').value,
+                note: document.getElementById('txtNote').value,
+                branchId: $("#cmbBranchType").data("kendoComboBox").value()
+            },
+            success: function (data) {
+                if (data.success == false) {
+                    alertify.alert(data.message);
+                    return;
+                }
+                window.location.href = "/GlobalData/Index";
+            },
+            error: function () { alertify.alert("Application error. Please try again."); }
+        });
+    });
+
+    $("#btnBack").bind("click", function () {
+        window.location.href = "/GlobalData/Index";
+    });
+</script>

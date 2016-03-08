@@ -1,0 +1,80 @@
+﻿@{
+    Layout = "~/Views/Shared/_TeledataTheme.cshtml";
+    ViewBag.Title = "Customer Baru";
+}
+<h2>@ViewBag.Title</h2>
+<h3>@ViewBag.Message</h3>
+
+<button class="k-button k-button-icontext" id="btnBack">
+    <span class="k-icon k-i-arrow-w"></span>Kembali
+</button>
+&nbsp;
+<button class="k-button k-button-icontext" id="btnSave">
+    <span class="k-icon k-i-tick"></span>Simpan
+</button>
+<hr />
+
+
+Nama:<br />
+@Html.TextBox("txtNama", "", new { @class = "td", style = "width : 320px" })
+<br /><br />
+
+Alamat:<br />
+@Html.TextBox("txtAddress", "", new { @class = "td", style = "width : 320px" })
+<br /><br />
+
+Mobile:<br />
+@Html.TextBox("txtMobile", "", new { @class = "td", style = "width : 320px" })
+<br /><br />
+
+Email:<br />
+@Html.TextBox("txtEmail", "", new { @class = "td", style = "width : 320px" })
+<br /><br />
+
+Note:<br />
+@Html.TextArea("txtNote", "", new { @class = "td", style = "width : 320px" })
+<br /><br />
+
+Cabang:<br />
+@(Html.Kendo().ComboBox()
+        .Name("cmbBranch")
+        .DataTextField("Display")
+        .DataValueField("Key")
+        .DataSource(source =>
+        {
+            source.Read(read =>
+            {
+                read.Action("GetBranch", "Create");
+            });
+        })
+        .HtmlAttributes(new { style = "width:300px" })
+        .Filter(FilterType.Contains)
+        .Suggest(true)
+        .Placeholder("-Select value-"))
+<script>
+    $("#btnSave").bind("click", function () {
+        $.ajax({
+            url: '@Url.Action("Create")', type: "POST", dataType: "json",
+            data: {
+                name: document.getElementById('txtNama').value,
+                address: document.getElementById('txtAddress').value,
+                mobile: document.getElementById('txtMobile').value,
+                email: document.getElementById('txtEmail').value,
+                note: document.getElementById('txtNote').value,
+                branchId: $("#cmbBranch").data("kendoComboBox").value()
+            },
+            success: function (data) {
+                if (data.success == false) {
+                    alertify.alert(data.message);
+                    return;
+                }
+                window.location.href = "/Customer/Index";
+            },
+            error: function () { alertify.alert("Application error. Please try again."); }
+        });
+    });
+
+    $("#btnBack").bind("click", function () {
+        window.location.href = "/Customer/Index";
+    });
+</script>

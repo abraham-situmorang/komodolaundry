@@ -1,0 +1,126 @@
+﻿@(Html.Kendo().Window()
+    .Name("windowAddData")
+    .Title("Tambah Rincian")
+    .Content
+    (@<text>
+
+<button class="k-button k-button-icontext" id="btnSaveData">
+    <span class="k-icon k-i-tick"></span>Simpan
+</button>
+<br />
+
+Note:<br />
+@Html.TextArea("txtDetailNote", "", new { @class = "td", style = "width : 320px" })
+<br /><br />
+
+Qty:<br />
+@(Html.Kendo().NumericTextBox().Name("txtQty"))
+<br /><br />
+
+Weight:<br />
+@(Html.Kendo().NumericTextBox().Name("txtWeight"))
+<br /><br />
+
+Brand:<br />
+@(Html.Kendo().ComboBox()
+        .Name("cmbBrand")
+        .DataTextField("Display")
+        .DataValueField("Key")
+        .DataSource(source =>
+        {
+            source.Read(read =>
+            {
+                read.Action("GetBrandData", "Create");
+            });
+        })
+        .HtmlAttributes(new { style = "width:300px" })
+        .Filter(FilterType.Contains)
+        .Suggest(true)
+        .Placeholder("-Select value-"))
+<br /><br />
+
+Colour:<br />
+@(Html.Kendo().ComboBox()
+        .Name("cmbColour")
+        .DataTextField("Display")
+        .DataValueField("Key")
+        .DataSource(source =>
+        {
+            source.Read(read =>
+            {
+                read.Action("GetColourData", "Create");
+            });
+        })
+        .HtmlAttributes(new { style = "width:300px" })
+        .Filter(FilterType.Contains)
+        .Suggest(true)
+        .Placeholder("-Select value-"))
+<br /><br />
+
+Pakaian:<br />
+@(Html.Kendo().ComboBox()
+        .Name("cmbGarment")
+        .DataTextField("Display")
+        .DataValueField("Key")
+        .DataSource(source =>
+        {
+            source.Read(read =>
+            {
+                read.Action("GetGarmentData", "Create");
+            });
+        })
+        .HtmlAttributes(new { style = "width:300px" })
+        .Filter(FilterType.Contains)
+        .Suggest(true)
+        .Placeholder("-Select value-"))
+<br /><br />
+
+    </text>)
+    .Draggable()
+    .Resizable()
+    .Visible(false)
+    .Modal(true)
+    .Actions(actions => actions.Pin().Minimize().Maximize().Close())
+)
+
+<script>
+    $("#btnSaveData").bind("click", function () {
+        $.ajax({
+            url: '@Url.Action("AddData")', type: "POST", dataType: "json",
+            data: {
+                note: document.getElementById('txtDetailNote').value,
+                qty: document.getElementById('txtQty').value,
+                weight: document.getElementById('txtWeight').value,
+                brandId: $("#cmbBrand").data("kendoComboBox").value(),
+                colourId: $("#cmbColour").data("kendoComboBox").value(),
+                garmentId: $("#cmbGarment").data("kendoComboBox").value()
+            },
+            success: function (data) {
+                if (data.success == false) {
+                    alertify.alert(data.message);
+                    return;
+                }
+                $("#windowAddData").data("kendoWindow").close();
+                $("#gridDetail").data("kendoGrid").dataSource.read();
+            },
+            error: function () { alertify.alert("Application error. Please try again."); }
+        });
+    });
+
+    function deleteData(id) {
+        $.ajax({
+            url: '@Url.Action("DelData")', type: "POST", dataType: "json",
+            data: {
+                id: id
+            },
+            success: function (data) {
+                if (data.success == false) {
+                    alertify.alert(data.message);
+                    return;
+                }
+                $("#gridDetail").data("kendoGrid").dataSource.read();
+            },
+            error: function () { alertify.alert("Application error. Please try again."); }
+        });
+    }
+</script>

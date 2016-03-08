@@ -1,0 +1,89 @@
+﻿@{
+    Layout = "~/Views/Shared/_TeledataTheme.cshtml";
+    ViewBag.Title = "Transfer Uang";
+}
+<h2>@ViewBag.Title</h2>
+<h3>@ViewBag.Message</h3>
+
+<button class="k-button k-button-icontext" id="btnBack">
+    <span class="k-icon k-i-arrow-w"></span>Kembali
+</button>
+&nbsp;
+<button class="k-button k-button-icontext" id="btnSave">
+    <span class="k-icon k-i-tick"></span>Simpan
+</button>
+<hr />
+
+Nomor:<br />
+@Html.TextBox("txtDocNumber", (string)ViewBag.DocNumber, new { @class = "td", style = "width : 320px" })
+<br /><br />
+
+Dari:<br />
+@(Html.Kendo().ComboBox()
+        .Name("cmbFrom")
+        .DataTextField("Display")
+        .DataValueField("Key")
+        .DataSource(source =>
+        {
+            source.Read(read =>
+            {
+                read.Action("GetCashBankData", "Transfer");
+            });
+        })
+        .HtmlAttributes(new { style = "width:300px" })
+        .Filter(FilterType.Contains)
+        .Suggest(true)
+        .Placeholder("-Select value-"))
+<br /><br />
+
+Ke:<br />
+@(Html.Kendo().ComboBox()
+        .Name("cmbTo")
+        .DataTextField("Display")
+        .DataValueField("Key")
+        .DataSource(source =>
+        {
+            source.Read(read =>
+            {
+                read.Action("GetCashBankData", "Transfer");
+            });
+        })
+        .HtmlAttributes(new { style = "width:300px" })
+        .Filter(FilterType.Contains)
+        .Suggest(true)
+        .Placeholder("-Select value-"))
+<br /><br />
+
+Note:<br />
+@Html.TextArea("txtNote", "", new { @class = "td", style = "width : 320px" })
+<br /><br />
+
+Jumlah:<br />
+@(Html.Kendo().NumericTextBox().Name("numericAmount"))
+
+<script>
+    $("#btnSave").bind("click", function () {
+        $.ajax({
+            url: '@Url.Action("Create")', type: "POST", dataType: "json",
+            data: {
+                docNumber: document.getElementById('txtDocNumber').value,
+                note: document.getElementById('txtNote').value,
+                fromCoa: $("#cmbFrom").data("kendoComboBox").value(),
+                toCoa: $("#cmbTo").data("kendoComboBox").value(),
+                amount: document.getElementById('numericAmount').value
+            },
+            success: function (data) {
+                if (data.success == false) {
+                    alertify.alert(data.message);
+                    return;
+                }
+                window.location.href = "/CashBank/Index";
+            },
+            error: function () { alertify.alert("Application error. Please try again."); }
+        });
+    });
+
+    $("#btnBack").bind("click", function () {
+        window.location.href = "/CashBank/Index";
+    });
+</script>

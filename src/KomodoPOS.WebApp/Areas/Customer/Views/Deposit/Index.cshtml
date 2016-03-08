@@ -1,0 +1,199 @@
+﻿@{
+    Layout = "~/Views/Shared/_TeledataTheme.cshtml";
+    ViewBag.Title = "Tambah Deposit";
+}
+<h2>@ViewBag.Title</h2>
+<h3>@ViewBag.Message</h3>
+<hr />
+<button class="k-button k-button-icontext" id="btnBack">
+    <span class="k-icon k-i-arrow-w"></span>Kembali
+</button>
+&nbsp;
+<button class="k-button k-button-icontext" id="btnSave">
+    <span class="k-icon k-i-tick"></span>Simpan
+</button>
+<hr />
+
+Cabang:<br />
+@(Html.Kendo().ComboBox()
+        .Name("cmbBranch")
+        .DataTextField("Display")
+        .DataValueField("Key")
+        .DataSource(source =>
+        {
+            source.Read(read =>
+            {
+                read.Action("GetBranchData", "Deposit");
+            });
+        })
+        .HtmlAttributes(new { style = "width:300px" })
+        .Filter(FilterType.Contains)
+        .Suggest(true)
+        .Placeholder("-Select value-"))
+<br /><br />
+
+Nomor:<br />
+@Html.TextBox("txtDocNumber", (string)ViewBag.DocNumber, new { @class = "td", style = "width : 320px" })
+<br /><br />
+
+Note:<br />
+@Html.TextArea("txtNote", "", new { @class = "td", style = "width : 320px" })
+<br /><br />
+
+Kas:<br />
+@(Html.Kendo().ComboBox()
+        .Name("cmbCashBank")
+        .DataTextField("Display")
+        .DataValueField("Key")
+        .DataSource(source =>
+        {
+            source.Read(read =>
+            {
+                read.Action("GetCashBankData", "Deposit");
+            });
+        })
+        .HtmlAttributes(new { style = "width:300px" })
+        .Filter(FilterType.Contains)
+        .Suggest(true)
+        .Placeholder("-Select value-"))
+<br /><br />
+
+Cara Pembayaran:<br />
+@(Html.Kendo().ComboBox()
+        .Name("cmbPayMethod")
+        .DataTextField("Display")
+        .DataValueField("Key")
+        .DataSource(source =>
+        {
+            source.Read(read =>
+            {
+                read.Action("GetPayMethodData", "Deposit");
+            });
+        })
+        .HtmlAttributes(new { style = "width:300px" })
+        .Filter(FilterType.Contains)
+        .Suggest(true)
+        .Placeholder("-Select value-"))
+<br /><br />
+
+Nama Kartu:<br />
+@Html.TextBox("txtMethodCardName", "", new { @class = "td", style = "width : 320px" })
+<br /><br />
+
+Nomor Kartu:<br />
+@Html.TextBox("txtMethodCardNumber", "", new { @class = "td", style = "width : 320px" })
+<br /><br />
+<hr />
+
+@Html.CheckBox("chkIsRegular") Regular
+
+<div id="DivService">
+    <br />
+    Layanan Regular:<br />
+    @(Html.Kendo().ComboBox()
+        .Name("cmbService")
+        .DataTextField("Display")
+        .DataValueField("Key")
+        .DataSource(source =>
+        {
+            source.Read(read =>
+            {
+                read.Action("GetServiceData", "Deposit");
+            });
+        })
+        .HtmlAttributes(new { style = "width:300px" })
+        .Filter(FilterType.Contains)
+        .Suggest(true)
+        .Placeholder("-Select value-"))
+    <br /><br />
+
+    Jumlah Rp.:<br />
+    @(Html.Kendo().NumericTextBox().Name("txtAmount"))
+</div>
+
+
+
+<div id="DivPackage">
+    <br />
+    Paket:<br />
+    @(Html.Kendo().ComboBox()
+        .Name("cmbPackage")
+        .DataTextField("Display")
+        .DataValueField("Key")
+        .DataSource(source =>
+        {
+            source.Read(read =>
+            {
+                read.Action("GetPackageData", "Deposit");
+            });
+        })
+        .HtmlAttributes(new { style = "width:300px" })
+        .Filter(FilterType.Contains)
+        .Suggest(true)
+        .Placeholder("-Select value-"))
+    <br /><br />
+</div>
+
+<script>
+    var _Id = "";
+    $(document).ready(function () {
+        GetData("@ViewBag.Id");
+        $("#DivService").hide();
+    });
+    function GetData(id)
+    {
+        _Id = id;
+    }
+
+    $("#chkIsRegular").bind("click", function () {
+        if (document.getElementById('chkIsRegular').checked) {
+            $("#DivService").show();
+            $("#DivPackage").hide();
+        } else {
+            $("#DivService").hide();
+            $("#DivPackage").show();
+        }
+    });
+
+    $("#btnSave").bind("click", function () {
+        openLoading();
+        $.ajax({
+            url: '@Url.Action("Create")', type: "POST", dataType: "json",
+            data: {
+                branchId: $("#cmbBranch").data("kendoComboBox").value(),
+                customerId: _Id,
+                docNumber: document.getElementById('txtDocNumber').value,
+                amount: document.getElementById('txtAmount').value,
+
+                cashBankCoaId: $("#cmbCashBank").data("kendoComboBox").value(),
+                payMethodId: $("#cmbPayMethod").data("kendoComboBox").value(),
+
+                methodCardName: document.getElementById('txtMethodCardName').value,
+                methodCardNumber: document.getElementById('txtMethodCardNumber').value,
+
+                isRegular: document.getElementById("chkIsRegular").checked,
+                packageId: $("#cmbPackage").data("kendoComboBox").value(),
+                serviceId: $("#cmbService").data("kendoComboBox").value(),
+                note: document.getElementById('txtNote').value,
+            },
+            success: function (data) {
+                if (data.success == false) {
+                    closeLoading();
+                    alertify.alert(data.message);
+                    return;
+                }
+                window.location.href = "/Customer/DepositDetail?msg=true&id=" + data.id;
+            },
+            error: function ()
+            {
+                closeLoading();
+                alertify.alert("Application error. Please try again.");
+            }
+        });
+    });
+
+    $("#btnBack").bind("click", function () {
+        closeLoading();
+        window.location.href = "/Customer/Index";
+    });
+</script>

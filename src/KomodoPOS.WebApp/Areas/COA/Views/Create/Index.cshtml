@@ -1,0 +1,66 @@
+﻿@{
+    Layout = "~/Views/Shared/_TeledataTheme.cshtml";
+    ViewBag.Title = "Akun Baru";
+}
+<h2>@ViewBag.Title</h2>
+<h3>@ViewBag.Message</h3>
+
+<button class="k-button k-button-icontext" id="btnBack">
+    <span class="k-icon k-i-arrow-w"></span>Kembali
+</button>
+&nbsp;
+<button class="k-button k-button-icontext" id="btnSave">
+    <span class="k-icon k-i-tick"></span>Simpan
+</button>
+<hr />
+
+Jenis Akun:<br />
+@(Html.Kendo().ComboBox()
+        .Name("cmbCOACategory")
+        .DataTextField("Display")
+        .DataValueField("Key")
+        .DataSource(source =>
+        {
+            source.Read(read =>
+            {
+                read.Action("GetCOACategory", "Create");
+            });
+        })
+        .HtmlAttributes(new { style = "width:300px" })
+        .Filter(FilterType.Contains)
+        .Suggest(true)
+        .Placeholder("-Select value-"))
+<br /><br />
+
+
+Nama:<br />
+@Html.TextBox("txtName", "", new { @class = "td", style = "width : 320px" })
+<br /><br />
+
+Nomor:<br />
+@Html.TextBox("txtCode", "", new { @class = "td", style = "width : 320px" })
+
+<script>
+    $("#btnSave").bind("click", function () {
+        $.ajax({
+            url: '@Url.Action("Create")', type: "POST", dataType: "json",
+            data: {
+                coaCategoryId: $("#cmbCOACategory").data("kendoComboBox").value(),
+                name: document.getElementById('txtName').value,
+                code: document.getElementById('txtCode').value
+            },
+            success: function (data) {
+                if (data.success == false) {
+                    alertify.alert(data.message);
+                    return;
+                }
+                window.location.href = "/COA/Index";
+            },
+            error: function () { alertify.alert("Application error. Please try again."); }
+        });
+    });
+
+    $("#btnBack").bind("click", function () {
+        window.location.href = "/COA/Index";
+    });
+</script>

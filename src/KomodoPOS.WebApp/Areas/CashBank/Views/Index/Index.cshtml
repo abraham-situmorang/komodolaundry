@@ -1,0 +1,68 @@
+﻿@{
+    Layout = "~/Views/Shared/_TeledataTheme.cshtml";
+    ViewBag.Title = "Kas & Bank";
+}
+<h2>@ViewBag.Title</h2>
+<h3>@ViewBag.Message</h3>
+<hr />
+<button class="k-button k-button-icontext" id="btnCreateNewTransfer">
+    <span class="k-icon k-i-seek-e"></span>Tranfer Uang
+</button>&nbsp;
+<button class="k-button k-button-icontext" id="btnCreateNewDeposit">
+    <span class="k-icon k-i-plus"></span>Terima Uang
+</button>&nbsp;
+<button class="k-button k-button-icontext" id="btnCreateNewWithdrawal">
+    <span class="k-icon k-si-minus"></span>Pembayaran/Penarikan Uang
+</button>
+<br />&nbsp;
+
+@(Html.Kendo().Grid<KomodoLaundry.WebApp.Models.COA.COAModel>()
+    .Name("grid")
+    .Pageable(pageable => pageable
+        .Refresh(true)
+        .PageSizes(new int[] { 20, 50, 200 })
+        .ButtonCount(5))
+    .Sortable()
+    .Groupable()
+    .Scrollable()
+    .Filterable()
+    .HtmlAttributes(new { style = "height:430px;" })
+    .Columns(columns =>
+    {
+        columns.Bound(o => o.Code);
+        columns.Bound(o => o.Name)
+            .ClientTemplate("<a href='javascript:detailTransaction(\"#= Id#\");' title='View Detail Transaction'>#: Name #</a>");
+        columns.Bound(o => o.Saldo);
+    })
+    .ToolBar(tools => tools.Pdf())
+    .Pdf(pdf => pdf
+        .AllPages()
+        .FileName("KomodoDataExport.pdf")
+        .ProxyURL(Url.Action("Pdf_Export_Save", "Index"))
+    )
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .PageSize(20)
+        .Read(read => read.Action("Read", "Index"))
+     )
+     .Selectable()
+    .Resizable(resize => resize.Columns(true))
+)
+
+
+<script>
+    $("#btnCreateNewTransfer").bind("click", function () {
+        window.location.href = "/CashBank/Transfer";
+    });
+    $("#btnCreateNewDeposit").bind("click", function () {
+        window.location.href = "/CashBank/Deposit";
+    });
+    $("#btnCreateNewWithdrawal").bind("click", function () {
+        window.location.href = "/CashBank/Withdrawal";
+    });
+
+    function detailTransaction(id)
+    {
+        window.location.href = "/CashBank/Detail?id=" + id;
+    }
+</script>

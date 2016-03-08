@@ -1,0 +1,48 @@
+﻿@(Html.Kendo().Window()
+    .Name("windowList")
+    .Title("Daftar Biaya")
+    .Width(700)
+    .Content
+    (@<text>
+
+@(Html.Kendo().Grid<KomodoLaundry.WebApp.Models.ExpenseDataModel>()
+    .Name("gridList")
+    .Pageable(pageable => pageable
+        .Refresh(true)
+        .PageSizes(new int[] { 20, 50, 200 })
+        .ButtonCount(5))
+    .Sortable()
+    .Groupable()
+    .Scrollable()
+    .Filterable()
+    .Columns(columns =>
+    {
+        columns.Bound(o => o.CoaExpense);
+        columns.Bound(o => o.Description);
+        columns.Bound(o => o.Amount).Format("{0:#,##}");
+    })
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .PageSize(20)
+        .Read(read => read.Action("ReadData", "Index").Data("OnParameter"))
+     )
+     .Selectable()
+    .Resizable(resize => resize.Columns(true))
+)
+
+
+    </text>)
+    .Draggable()
+    .Resizable()
+    .Visible(false)
+    .Modal(true)
+    .Actions(actions => actions.Pin().Minimize().Maximize().Close())
+)
+
+<script>
+    function OnParameter() {
+        return {
+            docId: _DocId
+        };
+    }
+</script>

@@ -1,0 +1,143 @@
+﻿@{
+    Layout = "~/Views/Shared/_TeledataTheme.cshtml";
+    ViewBag.Title = "Order Baru";
+}
+<h2>@ViewBag.Title</h2>
+<h3>@ViewBag.Message</h3>
+
+<button class="k-button k-button-icontext" id="btnBack">
+    <span class="k-icon k-i-arrow-w"></span>Kembali
+</button>
+&nbsp;
+<button class="k-button k-button-icontext" id="btnSave">
+    <span class="k-icon k-i-tick"></span>Simpan
+</button>
+<hr />
+
+Customer:<br />
+@(Html.Kendo().ComboBox()
+        .Name("cmbCustomer")
+        .DataTextField("Display")
+        .DataValueField("Key")
+        .DataSource(source =>
+        {
+            source.Read(read =>
+            {
+                read.Action("GetCustomerData", "Create");
+            });
+        })
+        .HtmlAttributes(new { style = "width:300px" })
+        .Filter(FilterType.Contains)
+        .Suggest(true)
+        .Placeholder("-Select value-"))
+&nbsp;<a href="#">NEW CUSTOMER</a>
+<br /><br />
+
+Cabang:<br />
+@(Html.Kendo().ComboBox()
+        .Name("cmbBranchData")
+        .DataTextField("Display")
+        .DataValueField("Key")
+        .DataSource(source =>
+        {
+            source.Read(read =>
+            {
+                read.Action("GetBranchData", "Create");
+            });
+        })
+        .HtmlAttributes(new { style = "width:300px" })
+        .Filter(FilterType.Contains)
+        .Suggest(true)
+        .Placeholder("-Select value-"))
+<br /><br />
+
+Nomor:<br />
+@Html.TextBox("txtDocNumber", (string)ViewBag.DocNumber, new { @class = "td", style = "width : 320px" })
+<br /><br />
+
+Note:<br />
+@Html.TextArea("txtNote", "", new { @class = "td", style = "width : 320px" })
+<br /><br />
+
+Total Item(Pakaian):<br />
+@(Html.Kendo().NumericTextBox().Name("txtTotalItem"))
+<br /><br />
+
+Total Berat:<br />
+@(Html.Kendo().NumericTextBox().Name("txtTotalWeight"))
+<br /><br />
+
+Layanan:<br />
+@(Html.Kendo().ComboBox()
+        .Name("cmbServiceData")
+        .DataTextField("Display")
+        .DataValueField("Key")
+        .DataSource(source =>
+        {
+            source.Read(read =>
+            {
+                read.Action("GetServiceData", "Create");
+            });
+        })
+        .HtmlAttributes(new { style = "width:300px" })
+        .Filter(FilterType.Contains)
+        .Suggest(true)
+        .Placeholder("-Select value-"))
+<br /><br />
+
+Paket:<br />
+@(Html.Kendo().ComboBox()
+        .Name("cmbPackageData")
+        .DataTextField("Display")
+        .DataValueField("Key")
+        .DataSource(source =>
+        {
+            source.Read(read =>
+            {
+                read.Action("GetPackageData", "Create");
+            });
+        })
+        .HtmlAttributes(new { style = "width:300px" })
+        .Filter(FilterType.Contains)
+        .Suggest(true)
+        .Placeholder("-Select value-"))
+<br /><br />
+
+@Html.Partial("Detail")
+@Html.Partial("AddData")
+<script>
+    $("#btnSave").bind("click", function () {
+        openLoading();
+        $.ajax({
+            url: '@Url.Action("Create")', type: "POST", dataType: "json",
+            data: {
+                customerId: $("#cmbCustomer").data("kendoComboBox").value(),
+                branchId: $("#cmbBranchData").data("kendoComboBox").value(),
+                docNumber: document.getElementById('txtDocNumber').value,
+                note: document.getElementById('txtNote').value,
+                totalItem: document.getElementById('txtTotalItem').value,
+                totalWeight: document.getElementById('txtTotalWeight').value,
+                serviceId: $("#cmbServiceData").data("kendoComboBox").value(),
+                packageId: $("#cmbPackageData").data("kendoComboBox").value()
+            },
+            success: function (data) {
+                if (data.success == false) {
+                    closeLoading();
+                    alertify.alert(data.message);
+                    return;
+                }
+                window.location.href = "/Order/Index";
+            },
+            error: function ()
+            {
+                closeLoading();
+                alertify.alert("Application error. Please try again.");
+            }
+        });
+    });
+
+    $("#btnBack").bind("click", function () {
+        openLoading();
+        window.location.href = "/Order/Index";
+    });
+</script>

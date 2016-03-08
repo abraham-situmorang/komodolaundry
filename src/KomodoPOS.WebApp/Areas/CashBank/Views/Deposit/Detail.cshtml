@@ -1,0 +1,57 @@
+﻿<button class="k-button k-button-icontext" id="btnCreateNewData">
+    <span class="k-icon k-add"></span>Tambah Rincian
+</button>
+<br />&nbsp;
+
+@(Html.Kendo().Grid<KomodoLaundry.WebApp.Models.CashBank.CashBankDepositDataModel>()
+    .Name("gridDetail")
+    .Pageable(pageable => pageable
+        .Refresh(true)
+        .PageSizes(new int[] { 20, 50, 200 })
+        .ButtonCount(5))
+    .Sortable()
+    .Groupable()
+    .Scrollable()
+    .Filterable()
+    .HtmlAttributes(new { style = "height:430px;" })
+    .Columns(columns =>
+    {
+        columns.Bound(o => o.Coa).Title("Nama Biaya");
+        columns.Bound(o => o.Description);
+        columns.Bound(o => o.Amount).Format("{0:#,##}");
+
+        columns.Bound(o => o.Id).Width(80).Filterable(false)
+            .Title("ACTION")
+            .ClientTemplate("<a href='javascript:deleteData(\"#= Id#\");' title='Delete'>Delete</a>");
+    })
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .PageSize(20)
+        .Read(read => read.Action("ReadData", "Deposit"))
+     )
+     .Selectable()
+    .Resizable(resize => resize.Columns(true))
+)
+
+<script>
+    $("#btnCreateNewData").bind("click", function () {
+        $("#windowAddData").data("kendoWindow").open().center();
+    });
+
+    function deleteData(id) {
+        $.ajax({
+            url: '@Url.Action("DelData")', type: "POST", dataType: "json",
+            data: {
+                id: id
+            },
+            success: function (data) {
+                if (data.success == false) {
+                    alertify.alert(data.message);
+                    return;
+                }
+                $("#gridDetail").data("kendoGrid").dataSource.read();
+            },
+            error: function () { alertify.alert("Application error. Please try again."); }
+        });
+    }
+</script>

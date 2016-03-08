@@ -1,0 +1,64 @@
+﻿
+@{
+    ViewBag.Title = "Login";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>@ViewBag.Title</h2>
+
+<div style="position:relative">
+    <br /><br />
+    Username:<br />
+    @(Html.Kendo().TextBox().Name("txtUserName"))
+
+    <br />
+    Password:<br />
+    @(Html.Kendo().TextBox().Name("txtPassword"))
+
+    <br />
+    <button class="k-button k-button-icontext" id="btnLogin">
+        <span class="k-icon k-i-tick"></span>Login
+    </button>
+</div>
+
+<script>
+    $("#btnLogin").bind("click", function () {
+        loginSystem();
+    });
+
+    $("#txtUserName").keypress(function (event) {
+        if (event.which == 13) {
+            loginSystem();
+        }
+    });
+    $("#txtPassword").keypress(function (event) {
+        if (event.which == 13) {
+            loginSystem();
+        }
+    });
+
+    function loginSystem() {
+        $("#windowPopUpLoading").data("kendoWindow").open().center();
+
+        $.ajax({
+            url: '@Url.Action("SignIn")', type: "POST", dataType: "json",
+            data: {
+                _user: $('#txtUserName').val(),
+                _password: $('#txtPassword').val()
+            },
+            success: function (data) {
+                $("#windowPopUpLoading").data("kendoWindow").close();
+                if (data.success == false) {
+                    alertify.alert(data.message);
+                    return;
+                }
+                
+                if (data.success) window.location.href = "/";
+            },
+            error: function () {
+                $("#windowPopUpLoading").data("kendoWindow").close();
+                alertify.alert("Unable to logon. Please try again.");
+            }
+        });
+    }
+</script>

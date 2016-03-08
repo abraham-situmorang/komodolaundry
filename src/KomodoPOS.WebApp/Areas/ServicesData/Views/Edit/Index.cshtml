@@ -1,0 +1,85 @@
+﻿@{
+    Layout = "~/Views/Shared/_TeledataTheme.cshtml";
+    ViewBag.Title = "Edit Jenis Cabang";
+}
+<h2>@ViewBag.Title</h2>
+<h3>@ViewBag.Message</h3>
+
+<button class="k-button k-button-icontext" id="btnBack">
+    <span class="k-icon k-i-arrow-w"></span>Kembali
+</button>
+&nbsp;
+<button class="k-button k-button-icontext" id="btnSave">
+    <span class="k-icon k-i-tick"></span>Simpan
+</button>
+<hr />
+
+@Html.Hidden("hiddenId")
+
+Nama:<br />
+@Html.TextBox("txtName", "", new { @class = "td", style = "width : 320px" })
+<br /><br />
+
+Price:<br />
+@(Html.Kendo().NumericTextBox().Name("numericPrice"))
+<br /><br />
+
+Duration:<br />
+@Html.TextBox("txtDuration", "", new { @class = "td", style = "width : 320px" })
+<br /><br />
+
+Note:<br />
+@Html.TextArea("txtNote", "", new { @class = "td", style = "width : 320px" })
+
+<script>
+    $(document).ready(function () {
+        GetData("@ViewBag.Id");
+    });
+
+    function GetData(id)
+    {
+        $.ajax({
+            url: '@Url.Action("GetData")', type: "GET", dataType: "json",
+            data: {
+                id: id,
+            },
+            success: function (data) {
+                if (data.success == false) {
+                    alertify.alert(data.message);
+                    return;
+                }
+                document.getElementById('hiddenId').value = data.Id;
+                document.getElementById('txtName').value = data.Name;
+                $("#numericPrice").data("kendoNumericTextBox").value(data.Price);
+                document.getElementById('txtDuration').value = data.Duration;
+                document.getElementById('txtNote').value = data.Note;
+            },
+            error: function () { alertify.alert("Application error. Please try again."); }
+        });
+    }
+
+    $("#btnSave").bind("click", function () {
+        $.ajax({
+            url: '@Url.Action("Edit")', type: "POST", dataType: "json",
+            data: {
+                id: document.getElementById('hiddenId').value,
+                name: document.getElementById('txtName').value,
+                price: document.getElementById('numericPrice').value,
+                duration: document.getElementById('txtDuration').value,
+                note: document.getElementById('txtNote').value
+            },
+            success: function (data) {
+                if (data.success == false) {
+                    alertify.alert(data.message);
+                    return;
+                }
+                window.location.href = "/ServicesData/Index";
+            },
+            error: function () { alertify.alert("Application error. Please try again."); }
+        });
+    });
+
+    $("#btnBack").bind("click", function () {
+        window.location.href = "/ServicesData/Index";
+    });
+</script>

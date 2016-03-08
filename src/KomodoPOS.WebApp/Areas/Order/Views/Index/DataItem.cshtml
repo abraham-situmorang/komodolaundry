@@ -1,0 +1,51 @@
+﻿@(Html.Kendo().Window()
+    .Name("windowDataItem")
+    .Title("Data Item")
+    .Width(700)
+    .Content
+    (@<text>
+
+@(Html.Kendo().Grid<KomodoLaundry.WebApp.Models.Order.OrderDataModel>()
+    .Name("gridData")
+    .Pageable(pageable => pageable
+        .Refresh(true)
+        .PageSizes(new int[] { 20, 50, 200 })
+        .ButtonCount(5))
+    .Sortable()
+    .Groupable()
+    .Scrollable()
+    .Filterable()
+    .Columns(columns =>
+    {
+        columns.Bound(o => o.Note);
+        columns.Bound(o => o.Qty);
+        columns.Bound(o => o.Weight);
+        columns.Bound(o => o.Brand);
+        columns.Bound(o => o.Colour);
+        columns.Bound(o => o.Garment);
+    })
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .PageSize(20)
+        .Read(read => read.Action("ReadData", "Index").Data("OnParameter"))
+     )
+     .Selectable()
+    .Resizable(resize => resize.Columns(true))
+)
+
+
+    </text>)
+    .Draggable()
+    .Resizable()
+    .Visible(false)
+    .Modal(true)
+    .Actions(actions => actions.Pin().Minimize().Maximize().Close())
+)
+
+<script>
+    function OnParameter() {
+        return {
+            docId: _DocId
+        };
+    }
+</script>

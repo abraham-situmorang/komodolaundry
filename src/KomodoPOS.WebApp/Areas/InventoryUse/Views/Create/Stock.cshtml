@@ -1,0 +1,57 @@
+﻿<button class="k-button k-button-icontext" id="btnCreateNewData">
+    <span class="k-icon k-add"></span>Tambah Inventory
+</button>
+<br />&nbsp;
+
+@(Html.Kendo().Grid<KomodoLaundry.WebApp.Models.InventoryUseDataModel>()
+    .Name("gridStock")
+    .Pageable(pageable => pageable
+        .Refresh(true)
+        .PageSizes(new int[] { 20, 50, 200 })
+        .ButtonCount(5))
+    .Sortable()
+    .Groupable()
+    .Scrollable()
+    .Filterable()
+    .HtmlAttributes(new { style = "height:430px;" })
+    .Columns(columns =>
+    {
+        columns.Bound(o => o.Inventory);
+        columns.Bound(o => o.Qty);
+        columns.Bound(o => o.Unit);
+        
+        columns.Bound(o => o.Id).Width(80).Filterable(false)
+            .Title("ACTION")
+            .ClientTemplate("<a href='javascript:deleteData(\"#= Id#\");' title='Delete'>Delete</a>");
+    })
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .PageSize(20)
+        .Read(read => read.Action("ReadData", "Create"))
+     )
+     .Selectable()
+    .Resizable(resize => resize.Columns(true))
+)
+
+<script>
+    $("#btnCreateNewData").bind("click", function () {
+        $("#windowInventoryStockAddData").data("kendoWindow").open().center();
+    });
+
+    function deleteData(id) {
+        $.ajax({
+            url: '@Url.Action("DelData")', type: "POST", dataType: "json",
+            data: {
+                id: id
+            },
+            success: function (data) {
+                if (data.success == false) {
+                    alertify.alert(data.message);
+                    return;
+                }
+                $("#gridStock").data("kendoGrid").dataSource.read();
+            },
+            error: function () { alertify.alert("Application error. Please try again."); }
+        });
+    }
+</script>

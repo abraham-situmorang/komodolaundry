@@ -1,0 +1,90 @@
+﻿@{
+    Layout = "~/Views/Shared/_TeledataTheme.cshtml";
+    ViewBag.Title = "Edit Jenis Cabang";
+}
+<h2>@ViewBag.Title</h2>
+<h3>@ViewBag.Message</h3>
+
+<button class="k-button k-button-icontext" id="btnBack">
+    <span class="k-icon k-i-arrow-w"></span>Kembali
+</button>
+&nbsp;
+<button class="k-button k-button-icontext" id="btnSave">
+    <span class="k-icon k-i-tick"></span>Simpan
+</button>
+<hr />
+
+@Html.Hidden("hiddenId")
+
+Nama:<br />
+@Html.TextBox("txtName", "", new { @class = "td", style = "width : 320px" })
+<br /><br />
+
+Alamat:<br />
+@Html.TextBox("txtAddress", "", new { @class = "td", style = "width : 320px" })
+<br /><br />
+
+Contact Person:<br />
+@Html.TextBox("txtContactPerson", "", new { @class = "td", style = "width : 320px" })
+<br /><br />
+
+Contact Number:<br />
+@Html.TextBox("txtContactNumber", "", new { @class = "td", style = "width : 320px" })
+<br /><br />
+
+Note:<br />
+@Html.TextArea("txtNote", "", new { @class = "td", style = "width : 320px" })
+<script>
+    $(document).ready(function () {
+        GetData("@ViewBag.Id");
+    });
+
+    function GetData(id)
+    {
+        $.ajax({
+            url: '@Url.Action("GetData")', type: "GET", dataType: "json",
+            data: {
+                id: id,
+            },
+            success: function (data) {
+                if (data.success == false) {
+                    alertify.alert(data.message);
+                    return;
+                }
+                document.getElementById('hiddenId').value = data.Id;
+                document.getElementById('txtName').value = data.Name;
+                document.getElementById('txtAddress').value = data.Address;
+                document.getElementById('txtContactPerson').value = data.ContactPerson;
+                document.getElementById('txtContactNumber').value = data.ContactNumber;
+                document.getElementById('txtNote').value = data.Note;
+            },
+            error: function () { alertify.alert("Application error. Please try again."); }
+        });
+    }
+
+    $("#btnSave").bind("click", function () {
+        $.ajax({
+            url: '@Url.Action("Edit")', type: "POST", dataType: "json",
+            data: {
+                id: document.getElementById('hiddenId').value,
+                name: document.getElementById('txtName').value,
+                address: document.getElementById('txtAddress').value,
+                contactPerson: document.getElementById('txtContactPerson').value,
+                contactNumber: document.getElementById('txtContactNumber').value,
+                note: document.getElementById('txtNote').value,
+            },
+            success: function (data) {
+                if (data.success == false) {
+                    alertify.alert(data.message);
+                    return;
+                }
+                window.location.href = "/Supplier/Index";
+            },
+            error: function () { alertify.alert("Application error. Please try again."); }
+        });
+    });
+
+    $("#btnBack").bind("click", function () {
+        window.location.href = "/Supplier/Index";
+    });
+</script>

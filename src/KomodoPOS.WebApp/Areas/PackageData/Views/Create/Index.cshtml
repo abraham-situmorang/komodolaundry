@@ -1,0 +1,56 @@
+﻿@{
+    Layout = "~/Views/Shared/_TeledataTheme.cshtml";
+    ViewBag.Title = "Tambah Paket Baru";
+}
+<h2>@ViewBag.Title</h2>
+<h3>@ViewBag.Message</h3>
+
+<button class="k-button k-button-icontext" id="btnBack">
+    <span class="k-icon k-i-arrow-w"></span>Kembali
+</button>
+&nbsp;
+<button class="k-button k-button-icontext" id="btnSave">
+    <span class="k-icon k-i-tick"></span>Simpan
+</button>
+<hr />
+
+Nama:<br />
+@Html.TextBox("txtName", "", new { @class = "td", style = "width : 320px" })
+<br /><br />
+
+Harga:<br />
+@(Html.Kendo().NumericTextBox().Name("numericPrice"))
+<br /><br />
+
+Berat:<br />
+@(Html.Kendo().NumericTextBox().Name("numericWeight"))
+<br /><br />
+
+Note:<br />
+@Html.TextArea("txtNote", "", new { @class = "td", style = "width : 320px" })
+
+<script>
+    $("#btnSave").bind("click", function () {
+        $.ajax({
+            url: '@Url.Action("Create")', type: "POST", dataType: "json",
+            data: {
+                name: document.getElementById('txtName').value,
+                price: document.getElementById('numericPrice').value,
+                weight: document.getElementById('numericWeight').value,
+                note: document.getElementById('txtNote').value
+            },
+            success: function (data) {
+                if (data.success == false) {
+                    alertify.alert(data.message);
+                    return;
+                }
+                window.location.href = "/PackageData/Index";
+            },
+            error: function () { alertify.alert("Application error. Please try again."); }
+        });
+    });
+
+    $("#btnBack").bind("click", function () {
+        window.location.href = "/PackageData/Index";
+    });
+</script>

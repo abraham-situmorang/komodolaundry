@@ -1,0 +1,91 @@
+﻿@{
+    Layout = "~/Views/Shared/_TeledataTheme.cshtml";
+    ViewBag.Title = "Inventory";
+}
+<h2>@ViewBag.Title</h2>
+<h3>@ViewBag.Message</h3>
+<hr />
+<button class="k-button k-button-icontext" id="btnCreateNew">
+    <span class="k-icon k-add"></span>Tambah Inventory
+</button>
+<br />&nbsp;
+
+@(Html.Kendo().Grid<KomodoLaundry.WebApp.Models.InventoryModel>()
+    .Name("grid")
+    .Pageable(pageable => pageable
+        .Refresh(true)
+        .PageSizes(new int[] { 20, 50, 200 })
+        .ButtonCount(5))
+    .Sortable()
+    .Groupable()
+    .Scrollable()
+    .Filterable()
+    .HtmlAttributes(new { style = "height:430px;" })
+    .Columns(columns =>
+    {
+        columns.Bound(o => o.Name);
+        columns.Bound(o => o.InventoryCategory);
+        columns.Bound(o => o.CreatedDate).Format("{0:dd-MMM-yyyy}");
+        columns.Bound(o => o.Unit);
+        columns.Bound(o => o.Note);
+                
+        columns.Bound(o => o.Id).Width(80).Filterable(false)
+            .Title("ACTION")
+            .ClientTemplate("<a href='javascript:editData(\"#= Id#\");' title='Edit'>EDIT</a>");
+        columns.Bound(o => o.Id).Width(80).Filterable(false)
+            .HeaderHtmlAttributes(new { style = "display:none;" })
+            .ClientTemplate("<a href='javascript:deleteData(\"#= Id#\");' title='Hapus'>DELETE</a>");
+        columns.Bound(o => o.Id).Width(110).Filterable(false)
+            .HeaderHtmlAttributes(new { style = "display:none;" })
+            .ClientTemplate("<a href='javascript:stockData(\"#= Id#\");' title='Stock'>VIEW STOK</a>");
+    })
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .PageSize(20)
+        .Read(read => read.Action("Read", "Index"))
+     )
+     .Selectable()
+    .Resizable(resize => resize.Columns(true))
+)
+@Html.Partial("Stock")
+
+<script>
+    var _InvId = "";
+    $("#btnCreateNew").bind("click", function () {
+        window.location.href = "/InventoryData/Create";
+    });
+
+    function editData(id) {
+        window.location.href = "/InventoryData/Edit?id=" + id;
+    }
+
+    function deleteData(id) {
+        alertify.confirm("Anda yakin ?", function (e) {
+            if (e) {
+                funcDeleteData(id);
+            }
+        });
+    }
+    function funcDeleteData(id) {
+        $.ajax({
+            url: '@Url.Action("Delete")', type: "POST", dataType: "json",
+            data: {
+                id: id
+            },
+            success: function (data) {
+                if (data.success == false) {
+                    alertify.alert(data.message);
+                    return;
+                }
+                $("#grid").data("kendoGrid").dataSource.read();
+            },
+            error: function () { alertify.alert("Application error. Please try again."); }
+        });
+    }
+
+    function stockData(invId) {
+        _InvId = invId;
+        $("#windowInventoryStock").data("kendoWindow").open().center();
+        $("#gridStock").data("kendoGrid").dataSource.read();
+    }
+</script>

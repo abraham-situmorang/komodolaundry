@@ -1,0 +1,16 @@
+﻿@(Html.Kendo().Window()
+    .Name("windowPopUpLoading")
+    .Title("Loading...")
+    .Content
+    (@<text>
+<div class="panel panel-default">
+    <div class="panel-heading">working...</div>
+    <div class="panel-body csspinner ringed">
+        <p>Load data from server.</p>
+    </div>
+</div>
+</text>)
+    .Visible(false)
+    .Modal(true)
+    .Actions(actions => actions.Pin())
+)

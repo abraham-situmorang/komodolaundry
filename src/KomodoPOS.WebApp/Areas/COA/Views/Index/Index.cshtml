@@ -1,0 +1,55 @@
+﻿@{
+    Layout = "~/Views/Shared/_TeledataTheme.cshtml";
+    ViewBag.Title = "Daftar Akun";
+}
+<h2>@ViewBag.Title</h2>
+<h3>@ViewBag.Message</h3>
+<hr />
+<button class="k-button k-button-icontext" id="btnCreateNew">
+    <span class="k-icon k-add"></span>Tambah Akun
+</button>
+<br />&nbsp;
+
+@(Html.Kendo().Grid<KomodoLaundry.WebApp.Models.COA.COAModel>()
+    .Name("grid")
+    .Pageable(pageable => pageable
+        .Refresh(true)
+        .ButtonCount(5))
+    .Sortable()
+    .Groupable()
+    .Scrollable()
+    .Filterable()
+    .HtmlAttributes(new { style = "height:430px;" })
+    .Columns(columns =>
+    {
+        columns.Bound(o => o.Code).Title("Nomor");
+        columns.Bound(o => o.Name).Title("Nama");
+        columns.Bound(o => o.GlobalData).Title("Jenis");
+        columns.Bound(o => o.Saldo).Title("Saldo");
+                
+        columns.Bound(o => o.Id).Width(80).Filterable(false)
+            .Title("ACTION")
+            .ClientTemplate("<a href='javascript:editData(\"#= Id#\");' title='Edit'>EDIT</a>");
+    })
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .Read(read => read.Action("Read", "Index"))
+        .Group(groups =>
+        {
+            groups.AddDescending(g => g.GlobalData);
+        })
+     )
+     .Selectable()
+    .Resizable(resize => resize.Columns(true))
+)
+
+
+<script>
+    $("#btnCreateNew").bind("click", function () {
+        window.location.href = "/COA/Create";
+    });
+
+    function editData(id) {
+        window.location.href = "/COA/Edit?id=" + id;
+    }
+</script>

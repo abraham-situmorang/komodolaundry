@@ -1,0 +1,74 @@
+﻿@{
+    Layout = "~/Views/Shared/_TeledataTheme.cshtml";
+    ViewBag.Title = "Data Order";
+}
+<h2>@ViewBag.Title</h2>
+<h3>@ViewBag.Message</h3>
+<hr />
+<button class="k-button k-button-icontext" id="btnCreateNew">
+    <span class="k-icon k-add"></span>Order Baru
+</button>
+<br /> &nbsp;
+
+@(Html.Kendo().Grid<KomodoLaundry.WebApp.Models.Order.OrderModel>()
+    .Name("grid")
+    .Pageable(pageable => pageable
+        .Refresh(true)
+        .PageSizes(new int[] { 20, 50, 200 })
+        .ButtonCount(5))
+    .Sortable()
+    .Groupable()
+    .Scrollable()
+    .Filterable()
+    .HtmlAttributes(new { style = "height:430px;" })
+    .Columns(columns =>
+    {
+        columns.Bound(o => o.DocNumber);
+        columns.Bound(o => o.Note);
+        columns.Bound(o => o.IsVoid);
+        columns.Bound(o => o.Staff);
+        
+        columns.Bound(o => o.Branch);
+        columns.Bound(o => o.SourceBranch);
+        columns.Bound(o => o.CreatedDate).Format(KomodoLaundry.WebApp.Framework.Data.DateTimeFormat.FullDateTime);
+        columns.Bound(o => o.TotalItem);
+        
+        columns.Bound(o => o.TotalWeight);
+        columns.Bound(o => o.Status);
+        columns.Bound(o => o.IsCompletePay);
+        columns.Bound(o => o.TotalPayWeight);
+        
+        columns.Bound(o => o.Services);
+        columns.Bound(o => o.Package);
+                
+        columns.Bound(o => o.Id).Width(80).Filterable(false)
+            .Title("ACTION")
+            .ClientTemplate("<a href='javascript:viewData(\"#= Id#\");' title='Data Pakaian'>Data</a>");
+    })
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .PageSize(20)
+        .Read(read => read.Action("Read", "Index"))
+     )
+     .Selectable()
+    .Resizable(resize => resize.Columns(true))
+)
+@Html.Partial("DataItem")
+
+<script>
+    var _DocId = "";
+    $("#btnCreateNew").bind("click", function () {
+        window.location.href = "/Order/Create";
+    });
+
+    function payData(id) {
+        window.location.href = "/Order/Pay?id=" + id;
+    }
+
+    function viewData(DocId) {
+        _DocId = DocId;
+        $("#windowDataItem").data("kendoWindow").open().center();
+        $("#gridData").data("kendoGrid").dataSource.read();
+    }
+
+</script>
