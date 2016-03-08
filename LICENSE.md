@@ -1,8 +1,8 @@
-KomodoLaundry - Open Source 
+KomodoLaundry - Open Source Laundry Management Web App
 
-Copyright (C) 2006-2013 Abraham Situmorang, abraham dot situmorang at gmail dot com
-Copyright (C) 2012-2013 Benjamin Herila, ben [A] herila.net
-Copyright (C) N2 Contributors
+Copyright (C) 20015-2016 Abraham Situmorang, abraham dot situmorang at gmail dot com
+Copyright (C) Instinctschool Teams
+Copyright (C) KomodoLaundry Contributors
 
 ## GNU LESSER GENERAL PUBLIC LICENSE
 
